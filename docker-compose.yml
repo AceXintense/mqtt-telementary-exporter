@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  exporter:
+    build:
+      network: host
+      context: .
+    container_name: monitoring_exporter
+    restart: unless-stopped
+    volumes:
+      - ./:/usr/app/
+    expose:
+      - 9102
+    ports:
+      - 9102:9102
