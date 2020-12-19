@@ -13,6 +13,12 @@ let state = {
 		exhaust: { c: 0, f: 0},
 		ambient: { c: 0, f: 0},
 		delta: { c: 0, f: 0},
+		online: false,
+		activity: {
+			name: null,
+			json: null,
+			application: null
+		}
 	}
 };
 
@@ -23,6 +29,10 @@ client.on('connect', function () {
   client.subscribe('xbox/ambient/f', function (err) {});
   client.subscribe('xbox/delta/c', function (err) {});
   client.subscribe('xbox/delta/f', function (err) {});
+  client.subscribe('xbox/online', function (err) {});
+  client.subscribe('xbox/activity/name', function (err) {});
+  client.subscribe('xbox/activity/json', function (err) {});
+  client.subscribe('xbox/activity/application', function (err) {});
 });
 
 client.on('message', function (topic, message) {
@@ -41,6 +51,10 @@ app.get('/metrics', (request, response) => {
 	{xbox_ambient_f: state.xbox.ambient.f},
 	{xbox_delta_c: state.xbox.delta.c},
 	{xbox_ambient_f: state.xbox.delta.f},
+	{xbox_online: state.xbox.online},
+	{xbox_activity_name: state.xbox.activity.name},
+	{xbox_activity_json: state.xbox.activity.json},
+	{xbox_activity_application: state.xbox.activity.application},
     ];
 
     console.log(Object.keys(state));
