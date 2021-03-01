@@ -1,4 +1,12 @@
-# mqtt-exporter
-Exporter for the MQTT metrics that will be provided by my other projects that get telematics from sensors etc see more below:
-[Xbox Telematics](https://github.com/AceXintense/xbox-telematics)
-[Server Rack Telematics](https://github.com/AceXintense/server-rack-telematics)
+# MQTT Telementary Exporter
+
+Exporter for MQTT that will format all MQTT topics into a format that Prometheus can ingest which can then be used to chart information in Grafana etc.
+
+- [Xbox Telematics](https://github.com/AceXintense/xbox-telematics)
+- [Server Rack Telematics](https://github.com/AceXintense/server-rack-telematics)
+
+# Installation
+- Clone repository
+- Change docker-compose.yml's environment variables to point at your MQTT instance.
+- docker compose up -d
+Done!
