@@ -7,17 +7,26 @@ const host = process.env.MQTT_HOST;
 const port = process.env.MQTT_PORT;
 
 const mqtt = require('mqtt');
-const client  = mqtt.connect('mqtt://' + process.env.MQTT_HOST + ':' + process.env.MQTT_PORT, {
-  username: process.env.MQTT_USERNAME,
+const client  = mqtt.connect('mqtt://' + host + ':' + port, {
+  clientId: process.env.MQTT_CLIENT_ID,
+  clean: true,
+  username: process.env.MQTT_USER,
   password: process.env.MQTT_PASSWORD
 });
-let state = {};
 
+console.log('Environment');
+console.log(process.env);
+
+console.log('Starting up...');
+
+let state = {};
 client.on('connect', function () {
+  console.log('Connected to MQTT (' + host + ':' + port + ')');
   client.subscribe('#', function (err) {});
 });
 
 client.on('message', function (topic, message) {
+  console.log('[' + (new Date()).toGMTString() + '] ' + topic);
   state[topic.replace(/\//gi,'_')] = message.toString().trim().replace(/\0.*$/g,'');;
 });
 
@@ -27,6 +36,9 @@ app.get('/metrics', (request, response) => {
     Object.keys(state).map(function (item) {
       output += (prefix + item + ' ' + state[item] + "\n");
     });
+
+    const ip = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    console.log('[' + (new Date()).toGMTString() + '] ' + ip);
 
     response.send(output);
 });

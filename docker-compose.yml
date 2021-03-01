@@ -4,13 +4,15 @@ services:
     build:
       network: host
       context: .
-    container_name: monitoring_exporter
+    container_name: mqtt_exporter
     restart: unless-stopped
     environment:
-      - MQTT_HOST=""
-      - MQTT_USER=""
-      - MQTT_PASSWORD=""
-      - METRICS_PREFIX="mqtt_"
+      - MQTT_CLIENT_ID=exporter
+      - MQTT_HOST=
+      - MQTT_PORT=1883
+      - MQTT_USER=
+      - MQTT_PASSWORD=
+      - METRICS_PREFIX=mqtt_
       - METRICS_PORT=9101
     volumes:
       - ./:/usr/app/
