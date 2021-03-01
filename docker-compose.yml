@@ -14,8 +14,6 @@ services:
       - MQTT_PASSWORD=
       - METRICS_PREFIX=mqtt_
       - METRICS_PORT=9101
-    volumes:
-      - ./:/usr/app/
     expose:
       - 9101
     ports:
