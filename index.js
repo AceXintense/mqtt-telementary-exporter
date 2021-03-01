@@ -1,69 +1,34 @@
 const express = require('express');
 const app = express();
-const listenPort = 9102;
-const prefix = 'mqtt_';
+const listenPort = process.env.METRICS_PORT;
+const prefix = process.env.METRICS_PREFIX;
 
-const host = '';
-const port = 1883;
+const host = process.env.MQTT_HOST;
+const port = process.env.MQTT_PORT;
 
 const mqtt = require('mqtt');
-const client  = mqtt.connect('mqtt://' + host + ':' + port);
-let state = {
-	xbox: {
-		exhaust: { c: 0, f: 0},
-		ambient: { c: 0, f: 0},
-		delta: { c: 0, f: 0},
-		online: false,
-		activity: {
-			name: null,
-			json: null,
-			application: null
-		}
-	}
-};
+const client  = mqtt.connect('mqtt://' + process.env.MQTT_HOST + ':' + process.env.MQTT_PORT, {
+  username: process.env.MQTT_USERNAME,
+  password: process.env.MQTT_PASSWORD
+});
+let state = {};
 
 client.on('connect', function () {
-  client.subscribe('xbox/exhaust/c', function (err) {});
-  client.subscribe('xbox/exhaust/f', function (err) {});
-  client.subscribe('xbox/ambient/c', function (err) {});
-  client.subscribe('xbox/ambient/f', function (err) {});
-  client.subscribe('xbox/delta/c', function (err) {});
-  client.subscribe('xbox/delta/f', function (err) {});
-  client.subscribe('xbox/online', function (err) {});
-  client.subscribe('xbox/activity/name', function (err) {});
-  client.subscribe('xbox/activity/json', function (err) {});
-  client.subscribe('xbox/activity/application', function (err) {});
+  client.subscribe('#', function (err) {});
 });
 
 client.on('message', function (topic, message) {
-  let location = topic.split('/');
-  state[location[0]][location[1]][location[2]] = message.toString().trim().replace(/\0.*$/g,'');
-  console.log(location, state[location[0]][location[1]][location[2]]);
-
+  state[topic.replace(/\//gi,'_')] = message.toString().trim().replace(/\0.*$/g,'');;
 });
 
 app.get('/metrics', (request, response) => {
-    let main = '';
-    let strings = [
-	{xbox_exhust_c: state.xbox.exhaust.c},
-	{xbox_exhust_f: state.xbox.exhaust.f},
-	{xbox_ambient_c: state.xbox.ambient.c},
-	{xbox_ambient_f: state.xbox.ambient.f},
-	{xbox_delta_c: state.xbox.delta.c},
-	{xbox_ambient_f: state.xbox.delta.f},
-	{xbox_online: state.xbox.online},
-	{xbox_activity_name: state.xbox.activity.name},
-	{xbox_activity_json: state.xbox.activity.json},
-	{xbox_activity_application: state.xbox.activity.application},
-    ];
+    let output = '';
 
-    console.log(Object.keys(state));
-
-    strings.map((object) => {
-        main += prefix + Object.keys(object)[0] + ' ' + Object.values(object)[0] + '\n';
+    Object.keys(state).map(function (item) {
+      output += (prefix + item + ' ' + state[item] + "\n");
     });
 
-    response.send(main);
+    response.send(output);
 });
 
 app.listen(listenPort, (err) => {
