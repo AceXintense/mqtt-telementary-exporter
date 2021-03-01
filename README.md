@@ -9,4 +9,4 @@ Exporter for MQTT that will format all MQTT topics into a format that Prometheus
 - Clone repository
 - Change docker-compose.yml's environment variables to point at your MQTT instance.
 - docker compose up -d
-Done!
+- Container deployed time to point your prometheus instance at this instance.
